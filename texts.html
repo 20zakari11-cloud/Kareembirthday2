@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نصوص مع ثلوج وورود</title>
+
+<!-- خط Scheherazade -->
+<link href="https://fonts.googleapis.com/css2?family=Scheherazade:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+/* --- الصفحة الأساسية --- */
+body {
+    background-color: #001A46;
+    font-family: 'Scheherazade', serif;
+    color: white;
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative; /* مهم للـ overlay */
+    overflow: hidden;
+}
+
+.container {
+    width: 280px;
+    height: 500px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative; /* فوق الخلفية */
+    z-index: 2; /* فوق الثلج والورود */
+}
+
+.img {
+    width: 150px;
+    margin-bottom: 20px;
+    display: none;
+    border-radius: 20px;
+}
+
+.text {
+    font-size: 20px;
+    color: #ecf0f1;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.next-btn, .music-btn {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 25px;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.next-btn { background-color: #3498db; }
+.next-btn:active { transform: translateY(4px); }
+.music-btn { background-color: #27ae60; }
+.music-btn:active { transform: translateY(4px); }
+
+.animate { animation: pop 0.4s ease; }
+@keyframes pop { 0% { transform: scale(0.6); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+/* --- overlay الثلج والورود --- */
+.snow-circle {
+    position: absolute;
+    top: -20px;
+    background-color: white;
+    border-radius: 50%;
+    opacity: 0.5;
+    filter: blur(2px);
+    animation-name: fall;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    z-index: 0;
+}
+
+.snow-image {
+    position: absolute;
+    top: -120px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.9;
+    animation-name: fall;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    z-index: 1;
+}
+
+@keyframes fall {
+    0% { transform: translateY(-100px); opacity: 1; }
+    100% { transform: translateY(110vh); opacity: 0; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- محتوى الصفحة -->
+<div class="container">
+    <img src="Kareem.jpg" class="img" id="img1">
+    <img src="Flower.png" class="img" id="img2">
+
+    <div class="text" id="text"></div>
+
+    <button class="music-btn" id="musicBtn">تشغيل الموسيقى</button>
+    <button class="next-btn" id="nextBtn">التالي</button>
+</div>
+
+<audio id="bgMusic" loop>
+    <source src="https://www.dropbox.com/scl/fi/fmm6pm0ela0174wv7dkza/narvent-fainted-slowed-reverb-version?rlkey=jgensll3pd7wo8akg9z5oj56x&st=pha8as3d&dl=1" type="audio/mpeg">
+</audio>
+
+<script>
+/* --- النصوص والـ buttons --- */
+let texts = [
+    "كل عام و انت بخير يا افضل صديق و اكثر من صديق",
+    "كل وردة لها معنى وهاي الوردة هي اختياري لسبب خاص اللون الأزرق الفاتح بيحمل معنى الأمل وبترمز لوجودك جنبي حتى باصعب اللحظات اخترت هي الوردة لاننا مع بعض واجهنا كتير من الصعاب و المشاكل وعرفنا إنو الوفاء والشجاعة هم أساس أي علاقة حقيقية  زي هالوردة مثل ما بتصمد وتتحمل كمان صداقتنا قوية وثابتة معك كل شيء بيصير أفضل حتى لو الدنيا كانت عكسنا هاي الوردة مو بس وردة هي رسالة عن الصدق والإخلاص عن الصداقة اللي ما بتتأثر ولا بتنهار مهما كانت الظروف وحتى لو تاثرت بترجع بتقوي حالها",
+    "كنت اكثر من صديق بالنسبة لي لازلت اتذكر الايام الذي لعبنا فيها امونغ اس مع بعض و وضعنا نفس الاسامي و فزنا ب دور الامبسوتر و هذيك الايام الذي لعبنا فيها بكامل الشغف بلعبة فري فاير و الايام الذي كنا نتقابل فيها قبل المدرسة و الايام الذي طلبت منك مساعدة فيها لواجب الانكليزي كونك اسطورة بالانكليزي ",
+    "ربما نلتقي و اتمنى ان نلتقي انا لم اكن اريد ان افارق هذه الايام الرائعة بل الايام من فارقتني و عكست طريقنا و رغم ذلك صداقتنا كانت اقوى فقد صبرت علي مهما اخطئت و لعبت دور العقل الكبير بقلبٍ صغير",
+    "اتمنى ان اراك شخص سعيد من الداخل ليس من الخارج كمظهر، اعلم و اشعر انك تواجه الصراع بداخلك دون ان تظهر لي اريد ان اراك بسلامٍ نفسي",
+    "ربما لم استطع تذكر تفاصيل كثيرة (الآن) ولكن عندما اذهب للفراش يصبح سقف غرفتي مليئاً بالذكريات او عندما اغسل المواعين اصبح غارق بالذكريات اكثر من الصحن نفسه ",
+    "ربما لم استطع تذكر تفاصيل كثيرة (الآن) ولكن عندما اذهب للفراش يصبح سقف غرفتي مليئاً بالذكريات او عندما اغسل المواعين اصبح غارق بالذكريات اكثر من الصحن نفسه ",
+    "مهما بعدت المسافات بيننا ف انت في القلب لا تنسى هذا و إن اخطئت يوماً بحقك فاعلم ان الحياة غلبتني بمصاعبها ماعليك فعله ان تقول لي الجملة السرية! نط صوص من الشباك و سوف اعود لرشدي ف جميع الناس ينحدرون عن الطريق و ماعليك فعله ان ترشدهم مجدداً للطريق ",
+    "جميع الكلمات كتبت من صميم قلبي بدون مساعدة شات جيبيتي اسف ان كان كلامي ليس مؤثراً او ضعيف التقدير ولكن حقا انا لا اجد الكلام خارج عقلي ولاكن ان دخلت الى عقلي تراني مثل الشاعر احمد شوقي لدي مشاعر كثيرة لا تظهر بدون سبب   كل عام و اتمنى لك الخير دائماً ",
+    "النهاية، انا لم اصنع موقع رائع و جميل و لم استطع التعبير عن كلامي بشكل جيد و لم يكن شيء مميز مثل الاشياء المميزة الذي تصنعها لي ولكن تذكرت عندما قلت لي انت لا تحاول فقلت يجب علي ان احاول، إمكانياتي ضعيفة كل بحث عن مشكلة اريد ان اصلحها في الموقع تاخذ مني ساعة بسبب الانترنت او بطء الجوال ولاكنني حاولت اسف لانني اشعرك بعدم اهتمامي ولكنني انا اهتم و بشدة و لا اعلم لماذا اتكلم بالفصحى "
+];
+
+let index = 0;
+let textDiv = document.getElementById("text");
+let img1 = document.getElementById("img1");
+let img2 = document.getElementById("img2");
+let music = document.getElementById("bgMusic");
+let nextBtn = document.getElementById("nextBtn");
+let musicBtn = document.getElementById("musicBtn");
+
+function showContent() {
+    img1.style.display = "none";
+    img2.style.display = "none";
+    img1.classList.remove("animate");
+    img2.classList.remove("animate");
+    textDiv.classList.remove("animate");
+
+    if (index === 0) {
+        img1.style.display = "block";
+        img1.classList.add("animate");
+    }
+    if (index === 1) {
+        img2.style.display = "block";
+        img2.classList.add("animate");
+    }
+
+    textDiv.innerText = texts[index];
+    textDiv.classList.add("animate");
+}
+
+function nextText() {
+    if (index < texts.length - 1) {
+        index++;
+        showContent();
+    }
+}
+
+function playMusic() {
+    music.play().catch(e => console.log("تفاعل المستخدم مطلوب لتشغيل الموسيقى"));
+}
+
+showContent();
+nextBtn.addEventListener("click", nextText);
+musicBtn.addEventListener("click", playMusic);
+
+/* --- overlay الثلج والورود --- */
+const SNOW_COUNT = 40;
+const FLOWER_COUNT = 15;
+const IMAGE_PATH = "Flower.png";
+
+for (let i = 0; i < SNOW_COUNT; i++) {
+    const dot = document.createElement("div");
+    dot.className = "snow-circle";
+    const size = 2 + Math.random() * 5;
+    dot.style.width = size + "px";
+    dot.style.height = size + "px";
+    dot.style.left = Math.random() * 100 + "vw";
+    dot.style.animationDuration = 12 + Math.random() * 8 + "s";
+    dot.style.animationDelay = Math.random() * 10 + "s";
+    dot.style.opacity = 0.3 + Math.random() * 0.5;
+    document.body.appendChild(dot);
+}
+
+for (let i = 0; i < FLOWER_COUNT; i++) {
+    const img = document.createElement("div");
+    img.className = "snow-image";
+    const size = 60 + Math.random() * 40;
+    img.style.width = size + "px";
+    img.style.height = size + "px";
+    img.style.backgroundImage = `url(${IMAGE_PATH})`;
+    img.style.left = Math.random() * 100 + "vw";
+    img.style.animationDuration = 6 + Math.random() * 4 + "s";
+    img.style.animationDelay = Math.random() * 5 + "s";
+    img.style.opacity = 0.8 + Math.random() * 0.2;
+    document.body.appendChild(img);
+}
+</script>
+
+</body>
+</html>
